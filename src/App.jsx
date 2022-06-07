@@ -1,12 +1,15 @@
 import "./App.css";
 import React, { useState } from "react";
 import nextId from "react-id-generator";
+
 function App() {
   // aca se asigna la tarea
   const [tarea, setTarea] = useState("");
   const [tareas, setTareas] = useState([]);
   const [edicion, setEdicion] = useState(false);
   const [id, setId] = useState('');
+  const [error,setError] = useState(null)
+
   const deleteItem = (id) => {
     const res = tareas.filter((item) => item.id !== id);
     setTareas(res);
@@ -14,7 +17,7 @@ function App() {
   const editarTarea =(e)=>{
     e.preventDefault();
     if (!tarea.trim("")) {
-      console.log("elemento vacio");
+      setError('Escriba algo por favor... ')
       return;
     }
   const resArr = tareas.map(item=>item.id=== id ? {id:id, Nombretarea:tarea}:item)
@@ -22,19 +25,23 @@ function App() {
   setEdicion(false)
   setTarea('')
   setId('')
+  setError(null)
   }
   const editar=(item)=>{
 setEdicion(true)
 setTarea(item.Nombretarea)
 setId(item.id)
+
   }
   const agregarTarea = (e) => {
     e.preventDefault();
     if (!tarea.trim("")) {
-      console.log("elemento vacio");
+      setError('Escriba algo por favor... ')
       return;
     }
     setTarea("");
+    setError(null)
+    
     setTareas([...tareas, { id: nextId(), Nombretarea: tarea }]);
   };
   return (
@@ -45,23 +52,30 @@ setId(item.id)
         <div className="col-8">
           <h4 className="text-center">lista de tarea</h4>
           <ul>
-            {tareas.map((item) => (
-              <li className="list-group-item" key={item.id}>
-                <span className="lead">{item.Nombretarea}</span>
-                <button
-                  className="btn btn-danger btn-sm float-right mx-2"
-                  onClick={() => deleteItem(item.id)}
-                >
-                  Eliminar
-                </button>
-                <button
-                  className="btn btn-warning btn-sm float-right"
-                  onClick={() => editar(item)}
-                >
-                  Editar
-                </button>
-              </li>
-            ))}
+            {
+            tareas.length === 0 ? (
+              <li className="list-group-item">No hay tareas</li>
+            ) :
+            (
+              tareas.map((item) => (
+                <li className="list-group-item" key={item.id}>
+                  <span className="lead">{item.Nombretarea}</span>
+                  <button
+                    className="btn btn-danger btn-sm float-right mx-2"
+                    onClick={() => deleteItem(item.id)}
+                  >
+                    Eliminar
+                  </button>
+                  <button
+                    className="btn btn-warning btn-sm float-right"
+                    onClick={() => editar(item)}
+                  >
+                    Editar
+                  </button>
+                </li>
+              ))
+            )
+           }
           </ul>
         </div>
         <div className="col-4">
@@ -70,6 +84,9 @@ setId(item.id)
           }
           </h4>
           <form onSubmit={edicion? editarTarea:agregarTarea}>
+            {
+              error? <span className=" text-danger">{error}</span>: null
+            }
             <input
               type="text"
               className="form-control mb-2"
